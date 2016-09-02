@@ -1,0 +1,7 @@
+.idea/
+*.iml
+certs/
+target/
+node_modules/
+sphinx-model-generator/commands.dic
+sphinx-model-generator/commands.lm
