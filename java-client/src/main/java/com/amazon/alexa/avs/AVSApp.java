@@ -83,7 +83,8 @@ public class AVSApp extends JFrame implements ExpectSpeechListener, RecordingRMS
 
     public AVSApp(AlexaConfig config) throws Exception {
         alexaConfig = config;
-        controller = new AVSController(this, new AVSAudioPlayerFactory(), new AlertManagerFactory(),
+        // Will cause exceptions due to null second parameter. This should be throw away code.
+        controller = new AVSController(this, null, new AVSAudioPlayerFactory(), new AlertManagerFactory(),
                 getAVSClientFactory(alexaConfig), DialogRequestIdAuthority.getInstance());
 
         authSetup = new AuthSetup(config, this);

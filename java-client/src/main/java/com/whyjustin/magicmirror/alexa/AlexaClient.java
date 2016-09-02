@@ -28,6 +28,7 @@ package com.whyjustin.magicmirror.alexa;
 
 import java.io.IOException;
 
+import com.amazon.alexa.avs.AVSAudioPlayer.AlexaSpeechListener;
 import com.amazon.alexa.avs.AVSAudioPlayerFactory;
 import com.amazon.alexa.avs.AVSController;
 import com.amazon.alexa.avs.AlertManagerFactory;
@@ -35,11 +36,10 @@ import com.amazon.alexa.avs.DialogRequestIdAuthority;
 import com.amazon.alexa.avs.ExpectSpeechListener;
 import com.amazon.alexa.avs.RecordingRMSListener;
 import com.amazon.alexa.avs.RequestListener;
-import com.amazon.alexa.avs.auth.companionservice.CompanionServiceRegCodeResponse;
 import com.amazon.alexa.avs.http.AVSClientFactory;
 
 public class AlexaClient
-    implements ExpectSpeechListener, RecordingRMSListener
+    implements ExpectSpeechListener, AlexaSpeechListener, RecordingRMSListener
 {
   private final AVSController avsController;
   private final CompanionServiceAuthenticator companionServiceAuthenticator;
@@ -53,12 +53,12 @@ public class AlexaClient
   {
     this.alexaProxy = alexaProxy;
 
-    avsController = new AVSController(this, new AVSAudioPlayerFactory(), new AlertManagerFactory(),
+    avsController = new AVSController(this, this, new AVSAudioPlayerFactory(), new AlertManagerFactory(),
         new AVSClientFactory(alexaConfig), DialogRequestIdAuthority.getInstance());
 
     companionServiceAuthenticator = new CompanionServiceAuthenticator(alexaConfig);
     String registrationCode = companionServiceAuthenticator.requestRegistrationCode();
-    alexaProxy.handleRegistrationCode(registrationCode);
+    alexaProxy.onRegistrationCode(registrationCode);
 
     avsController.startHandlingDirectives();
   }
@@ -66,7 +66,7 @@ public class AlexaClient
   public void registerDevice() throws IOException {
     String token = companionServiceAuthenticator.requestAccessToken();
     avsController.onAccessTokenReceived(token);
-    alexaProxy.handleToken(token);
+    alexaProxy.onAccessToken(token);
   }
 
   public void triggerAlexa() {
@@ -75,13 +75,13 @@ public class AlexaClient
       @Override
       public void onRequestSuccess() {
         avsController.processingFinished();
-        alexaProxy.handleAlexaCompleted();
+        alexaProxy.onAlexaCompleted();
       }
 
       @Override
       public void onRequestError(Throwable e) {
         avsController.processingFinished();
-        alexaProxy.handleAlexaCompleted();
+        alexaProxy.onAlexaCompleted();
       }
     };
 
@@ -91,6 +91,16 @@ public class AlexaClient
   @Override
   public void onExpectSpeechDirective() {
 
+  }
+
+  @Override
+  public void onAlexaSpeechStarted() {
+    alexaProxy.onAlexaSpeechStarted();
+  }
+
+  @Override
+  public void onAlexaSpeechFinished() {
+    alexaProxy.onAlexaSpeechFinished();
   }
 
   @Override

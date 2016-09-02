@@ -42,6 +42,7 @@ Module.register('magic-mirror-voice', {
     else if (!runtime.isRegistered && runtime.registrationUrl) {
       var registerLink = document.createElement('div');
       registerLink.innerHTML = runtime.registrationUrl;
+      wrapper.className = "small";
       wrapper.appendChild(registerLink);
     }
 

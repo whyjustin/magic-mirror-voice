@@ -21,6 +21,7 @@ function SphinxJavaClient() {
   self.sphinxClient = undefined;
   self.boot = boot;
   self.listen = listen;
+  self.stop = stop;
 
   function boot(java, config, proxy) {
     self.java = java;
@@ -55,7 +56,21 @@ function SphinxJavaClient() {
 
     self.java.callMethod(self.sphinxClient, 'listen', function(error) {
       if (error) {
-        console.error('Unable to run trigger Listen in Sphinx Java Client:' + error);
+        console.error('Unable to run Listen in Sphinx Java Client:' + error);
+        return;
+      }
+    });
+  }
+
+  function stop() {
+    if (!self.isBooted) {
+      console.error('Must boot client via boot(config, proxy) before accessing');
+      return;
+    }
+
+    self.java.callMethod(self.sphinxClient, 'stop', function(error) {
+      if (error) {
+        console.error('Unable to run Stop in Sphinx Java Client:' + error);
         return;
       }
     });

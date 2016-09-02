@@ -13,7 +13,9 @@ package com.whyjustin.magicmirror.alexa;
 
 public interface AlexaProxy
 {
-  void handleRegistrationCode(String registrationCode);
-  void handleToken(String accessToken);
-  void handleAlexaCompleted();
+  void onRegistrationCode(String registrationCode);
+  void onAccessToken(String accessToken);
+  void onAlexaCompleted();
+  void onAlexaSpeechStarted();
+  void onAlexaSpeechFinished();
 }

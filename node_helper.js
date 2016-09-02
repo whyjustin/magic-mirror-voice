@@ -43,14 +43,20 @@ module.exports = NodeHelper.create({
         bootstrap(self.config).then(function(java) {
           alexaJavaClient = alexaJavaClientFactory.get();
           alexaJavaClient.boot(java, self.config, {
-            handleRegistrationCode: function(registrationCode) {
+            onRegistrationCode: function(registrationCode) {
               self.handleRegistrationCode(registrationCode);
             },
-            handleToken: function(token) {
-              self.handleToken(token);
+            onAccessToken: function(token) {
+              self.handleAccessToken(token);
             },
-            handleAlexaCompleted: function() {
+            onAlexaCompleted: function() {
 
+            },
+            onAlexaSpeechStarted: function() {
+              self.handleAlexaSpeechStarted();
+            },
+            onAlexaSpeechFinished: function() {
+              self.handleAlexaSpeechFinished();
             }
           });
 
@@ -76,11 +82,17 @@ module.exports = NodeHelper.create({
     console.info('Register Alexa Java Client by navigating to ' + runtime.registrationUrl);
     self.sendSocketNotification('UPDATE_DOM', runtime);
   },
-  handleToken: function(token) {
+  handleAccessToken: function(token) {
     var self = this;
     runtime.isRegistered = true;
     console.info('Alexa Java Client registered with token: ' + token);
     self.sendSocketNotification('UPDATE_DOM', runtime);
+  },
+  handleAlexaSpeechStarted: function() {
+    sphinxJavaClient.stop();
+  },
+  handleAlexaSpeechFinished: function() {
+    sphinxJavaClient.listen();
   },
   handleCommand: function(command) {
     var self = this;
