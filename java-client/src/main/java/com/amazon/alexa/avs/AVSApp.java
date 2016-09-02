@@ -48,7 +48,7 @@ import javax.swing.SwingWorker;
 import com.amazon.alexa.avs.auth.AccessTokenListener;
 import com.amazon.alexa.avs.auth.AuthSetup;
 import com.amazon.alexa.avs.auth.companionservice.RegCodeDisplayHandler;
-import com.amazon.alexa.avs.config.DeviceConfig;
+import com.whyjustin.magicmirror.alexa.AlexaConfig;
 import com.amazon.alexa.avs.http.AVSClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class AVSApp extends JFrame implements ExpectSpeechListener, RecordingRMS
     private JTextField tokenTextField;
     private JProgressBar visualizer;
     private Thread autoEndpoint = null; // used to auto-endpoint while listening
-    private final DeviceConfig deviceConfig;
+    private final AlexaConfig alexaConfig;
     // minimum audio level threshold under which is considered silence
     private static final int ENDPOINT_THRESHOLD = 5;
     private static final int ENDPOINT_SECONDS = 2; // amount of silence time before endpointing
@@ -81,10 +81,10 @@ public class AVSApp extends JFrame implements ExpectSpeechListener, RecordingRMS
 
     private AuthSetup authSetup;
 
-    public AVSApp(DeviceConfig config) throws Exception {
-        deviceConfig = config;
+    public AVSApp(AlexaConfig config) throws Exception {
+        alexaConfig = config;
         controller = new AVSController(this, new AVSAudioPlayerFactory(), new AlertManagerFactory(),
-                getAVSClientFactory(deviceConfig), DialogRequestIdAuthority.getInstance());
+                getAVSClientFactory(alexaConfig), DialogRequestIdAuthority.getInstance());
 
         authSetup = new AuthSetup(config, this);
         authSetup.addAccessTokenListener(this);
@@ -127,13 +127,13 @@ public class AVSApp extends JFrame implements ExpectSpeechListener, RecordingRMS
         return title;
     }
 
-    protected AVSClientFactory getAVSClientFactory(DeviceConfig config) {
+    protected AVSClientFactory getAVSClientFactory(AlexaConfig config) {
         return new AVSClientFactory(config);
     }
 
     private void addDeviceField() {
-        JLabel productIdLabel = new JLabel(deviceConfig.getProductId());
-        JLabel dsnLabel = new JLabel(deviceConfig.getDsn());
+        JLabel productIdLabel = new JLabel(alexaConfig.getProductId());
+        JLabel dsnLabel = new JLabel(alexaConfig.getDsn());
         productIdLabel.setFont(productIdLabel.getFont().deriveFont(Font.PLAIN));
         dsnLabel.setFont(dsnLabel.getFont().deriveFont(Font.PLAIN));
 
@@ -343,7 +343,7 @@ public class AVSApp extends JFrame implements ExpectSpeechListener, RecordingRMS
     @Override
     public void displayRegCode(String regCode) {
         String regUrl =
-                deviceConfig.getCompanionServiceInfo().getServiceUrl() + "/provision/" + regCode;
+                alexaConfig.getCompanionServiceInfo().getServiceUrl() + "/provision/" + regCode;
         showDialog("Please register your device by visiting the following website on "
                 + "any system and following the instructions:\n" + regUrl
                 + "\n\n Hit OK once completed.");

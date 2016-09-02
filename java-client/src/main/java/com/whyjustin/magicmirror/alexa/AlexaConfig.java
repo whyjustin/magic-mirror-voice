@@ -24,7 +24,7 @@
  * KIND, either express or implied. See the License for the specific language governing permissions and limitations
  * under the License.
  */
-package com.amazon.alexa.avs.config;
+package com.whyjustin.magicmirror.alexa;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Container that encapsulates all the information that exists in the config file.
  */
-public class DeviceConfig
+public class AlexaConfig
 {
   private static final String DEFAULT_HOST = "https://avs-alexa-na.amazon.com";
 
@@ -52,9 +52,8 @@ public class DeviceConfig
    */
   private CompanionServiceInformation companionServiceInfo;
 
-
   /**
-   * Creates a {@link DeviceConfig} object.
+   * Creates a {@link AlexaConfig} object.
    *
    * @param productId
    *            The productId of this device.
@@ -63,7 +62,7 @@ public class DeviceConfig
    * @param companionServiceInfo
    *            The information necessary for the Companion Service method of provisioning.
    */
-  public DeviceConfig(String productId, String dsn, CompanionServiceInformation companionServiceInfo) {
+  public AlexaConfig(String productId, String dsn, CompanionServiceInformation companionServiceInfo) {
     if (StringUtils.isBlank(productId)) {
       throw new IllegalArgumentException("productId is required.");
     }

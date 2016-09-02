@@ -34,7 +34,7 @@ import java.util.TimerTask;
 import com.amazon.alexa.avs.auth.AccessTokenListener;
 import com.amazon.alexa.avs.auth.OAuth2AccessToken;
 import com.amazon.alexa.avs.auth.companionservice.CompanionServiceClient.RemoteServiceException;
-import com.amazon.alexa.avs.config.DeviceConfig;
+import com.whyjustin.magicmirror.alexa.AlexaConfig;
 
 public class CompanionServiceAuthManager
 {
@@ -43,7 +43,7 @@ public class CompanionServiceAuthManager
    */
   private static final int TOKEN_REFRESH_RETRY_INTERVAL_IN_S = 2;
 
-  private final DeviceConfig deviceConfig;
+  private final AlexaConfig alexaConfig;
 
   private final CompanionServiceClient companionServiceClient;
 
@@ -57,12 +57,12 @@ public class CompanionServiceAuthManager
 
   private String sessionId;
 
-  public CompanionServiceAuthManager(DeviceConfig deviceConfig,
+  public CompanionServiceAuthManager(AlexaConfig alexaConfig,
                                      CompanionServiceClient remoteProvisioningClient,
                                      RegCodeDisplayHandler regCodeDisplayHandler,
                                      AccessTokenListener accessTokenListener)
   {
-    this.deviceConfig = deviceConfig;
+    this.alexaConfig = alexaConfig;
     this.companionServiceClient = remoteProvisioningClient;
     this.regCodeDisplayHandler = regCodeDisplayHandler;
     this.accessTokenListener = accessTokenListener;
@@ -70,7 +70,7 @@ public class CompanionServiceAuthManager
   }
 
   public void startRemoteProvisioning() {
-    if (deviceConfig.getCompanionServiceInfo() != null && sessionId != null) {
+    if (alexaConfig.getCompanionServiceInfo() != null && sessionId != null) {
       try {
         refreshTokens();
       }
@@ -114,7 +114,7 @@ public class CompanionServiceAuthManager
   }
 
   public void requestAccessToken(String sessionId) {
-    if (deviceConfig.getCompanionServiceInfo() != null) {
+    if (alexaConfig.getCompanionServiceInfo() != null) {
       while (true) {
         try {
           token = companionServiceClient.getAccessToken(sessionId);
@@ -143,7 +143,7 @@ public class CompanionServiceAuthManager
   }
 
   private void refreshTokens() {
-    if (deviceConfig.getCompanionServiceInfo() != null) {
+    if (alexaConfig.getCompanionServiceInfo() != null) {
       requestAccessToken(sessionId);
     }
   }

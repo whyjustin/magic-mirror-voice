@@ -9,14 +9,14 @@
 package com.amazon.alexa.avs.http;
 
 import com.amazon.alexa.avs.DirectiveEnqueuer;
-import com.amazon.alexa.avs.config.DeviceConfig;
+import com.whyjustin.magicmirror.alexa.AlexaConfig;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 public class AVSClientFactory {
-    private DeviceConfig config;
+    private AlexaConfig config;
 
-    public AVSClientFactory(DeviceConfig config) {
+    public AVSClientFactory(AlexaConfig config) {
         this.config = config;
     }
 

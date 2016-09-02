@@ -13,23 +13,15 @@
  * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- *
- * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * You may not use this file except in compliance with the License. A copy of the License is located the "LICENSE.txt"
- * file accompanying this source. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language governing permissions and limitations
- * under the License.
  */
-package com.whyjustin.magicmirror.alexa;
+package com.whyjustin.magicmirror.sphinx;
 
-public class VoicePatternConfig
+public class SphinxConfig
 {
   private final String dictionaryPath;
   private final String languageModelPath;
 
-  public VoicePatternConfig(String dictionaryPath, String languageModelPath) {
+  public SphinxConfig(String dictionaryPath, String languageModelPath) {
     this.dictionaryPath = dictionaryPath;
     this.languageModelPath = languageModelPath;
   }

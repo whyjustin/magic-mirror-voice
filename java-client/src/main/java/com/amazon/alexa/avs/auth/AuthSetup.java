@@ -30,7 +30,7 @@ import java.util.Set;
 import com.amazon.alexa.avs.auth.companionservice.CompanionServiceAuthManager;
 import com.amazon.alexa.avs.auth.companionservice.CompanionServiceClient;
 import com.amazon.alexa.avs.auth.companionservice.RegCodeDisplayHandler;
-import com.amazon.alexa.avs.config.DeviceConfig;
+import com.whyjustin.magicmirror.alexa.AlexaConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,19 +42,19 @@ public class AuthSetup implements AccessTokenListener {
 
     private static final Logger log = LoggerFactory.getLogger(AuthSetup.class);
 
-    private final DeviceConfig deviceConfig;
+    private final AlexaConfig alexaConfig;
     private final RegCodeDisplayHandler regCodeDisplayHandler;
     private final Set<AccessTokenListener> accessTokenListeners = new HashSet<>();
 
     /**
      * Creates an {@link AuthSetup} object.
      *
-     * @param deviceConfig
+     * @param alexaConfig
      *            Information about this device.
      * @param regCodeDisplayHandler
      */
-    public AuthSetup(final DeviceConfig deviceConfig, final RegCodeDisplayHandler regCodeDisplayHandler) {
-        this.deviceConfig = deviceConfig;
+    public AuthSetup(final AlexaConfig alexaConfig, final RegCodeDisplayHandler regCodeDisplayHandler) {
+        this.alexaConfig = alexaConfig;
         this.regCodeDisplayHandler = regCodeDisplayHandler;
     }
 
@@ -68,9 +68,9 @@ public class AuthSetup implements AccessTokenListener {
     public void startProvisioningThread() {
 
         CompanionServiceClient remoteProvisioningClient =
-            new CompanionServiceClient(deviceConfig);
+            new CompanionServiceClient(alexaConfig);
         final CompanionServiceAuthManager authManager = new CompanionServiceAuthManager(
-            deviceConfig, remoteProvisioningClient, regCodeDisplayHandler, this);
+            alexaConfig, remoteProvisioningClient, regCodeDisplayHandler, this);
 
         Thread provisioningThread = new Thread()
         {

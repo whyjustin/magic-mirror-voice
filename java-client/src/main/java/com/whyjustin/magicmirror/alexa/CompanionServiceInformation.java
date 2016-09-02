@@ -22,7 +22,7 @@
  * KIND, either express or implied. See the License for the specific language governing permissions and limitations
  * under the License.
  */
-package com.amazon.alexa.avs.config;
+package com.whyjustin.magicmirror.alexa;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -69,13 +69,13 @@ public class CompanionServiceInformation {
     public URL getServiceUrl() {
         if (serviceUrl == null) {
             if ( StringUtils.isBlank( serviceUrlString)) {
-                throw new DeviceConfig.MalformedConfigException(
+                throw new AlexaConfig.MalformedConfigException(
                     SERVICE_URL + " is blank in your config file.");
             } else {
                 try {
                     this.serviceUrl = new URL(serviceUrlString);
                 } catch (MalformedURLException e) {
-                    throw new DeviceConfig.MalformedConfigException(
+                    throw new AlexaConfig.MalformedConfigException(
                         SERVICE_URL + " is malformed in your config file.", e);
                 }
             }
@@ -123,22 +123,22 @@ public class CompanionServiceInformation {
     public boolean isValid() {
         getServiceUrl(); // Verifies that the URL is valid
         if (StringUtils.isBlank(sslClientKeyStore)) {
-            throw new DeviceConfig.MalformedConfigException(
+            throw new AlexaConfig.MalformedConfigException(
                 SSL_CLIENT_KEYSTORE + " is blank in your config file.");
         } else {
             File sslClientKeyStoreFile = new File( sslClientKeyStore);
             if (!sslClientKeyStoreFile.exists()) {
-                throw new DeviceConfig.MalformedConfigException(
+                throw new AlexaConfig.MalformedConfigException(
                     sslClientKeyStore + " " + SSL_CLIENT_KEYSTORE + " does not exist.");
             }
         }
 
         if (StringUtils.isBlank(sslCaCert)) {
-            throw new DeviceConfig.MalformedConfigException( SSL_CA_CERT + " is blank in your config file.");
+            throw new AlexaConfig.MalformedConfigException( SSL_CA_CERT + " is blank in your config file.");
         } else {
             File sslCaCertFile = new File(sslCaCert);
             if (!sslCaCertFile.exists()) {
-                throw new DeviceConfig.MalformedConfigException(
+                throw new AlexaConfig.MalformedConfigException(
                     sslCaCertFile + " " + SSL_CA_CERT + " does not exist.");
             }
         }

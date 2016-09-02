@@ -10,7 +10,7 @@ package com.amazon.alexa.avs.auth.companionservice;
 
 import com.amazon.alexa.avs.auth.AuthConstants;
 import com.amazon.alexa.avs.auth.OAuth2AccessToken;
-import com.amazon.alexa.avs.config.DeviceConfig;
+import com.whyjustin.magicmirror.alexa.AlexaConfig;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +51,7 @@ import javax.net.ssl.TrustManagerFactory;
  */
 public class CompanionServiceClient {
 
-    private final DeviceConfig deviceConfig;
+    private final AlexaConfig alexaConfig;
     private SSLSocketFactory pinnedSSLSocketFactory;
 
     private static final Logger log = LoggerFactory.getLogger(CompanionServiceClient.class);
@@ -59,21 +59,21 @@ public class CompanionServiceClient {
     /**
      * Creates an {@link CompanionServiceClient} object.
      *
-     * @param deviceConfig
+     * @param alexaConfig
      */
-    public CompanionServiceClient(DeviceConfig deviceConfig) {
-        this.deviceConfig = deviceConfig;
+    public CompanionServiceClient(AlexaConfig alexaConfig) {
+        this.alexaConfig = alexaConfig;
         this.pinnedSSLSocketFactory = getPinnedSSLSocketFactory();
     }
 
     /**
      * Creates an {@link CompanionServiceClient} object.
      *
-     * @param deviceConfig
+     * @param alexaConfig
      * @param sslSocketFactory
      */
-    protected CompanionServiceClient(DeviceConfig deviceConfig, SSLSocketFactory sslSocketFactory) {
-        this.deviceConfig = deviceConfig;
+    protected CompanionServiceClient(AlexaConfig alexaConfig, SSLSocketFactory sslSocketFactory) {
+        this.alexaConfig = alexaConfig;
         this.pinnedSSLSocketFactory = sslSocketFactory;
     }
 
@@ -89,7 +89,7 @@ public class CompanionServiceClient {
             // Load the CA certificate into memory
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             caCertInputStream =
-                    new FileInputStream(deviceConfig.getCompanionServiceInfo().getSslCaCert());
+                    new FileInputStream(alexaConfig.getCompanionServiceInfo().getSslCaCert());
             Certificate caCert = cf.generateCertificate(caCertInputStream);
 
             // Load the CA certificate into the trusted KeyStore
@@ -105,8 +105,8 @@ public class CompanionServiceClient {
             // Load the client certificate and private key into another KeyStore
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
             clientKeyPair = new FileInputStream(
-                    deviceConfig.getCompanionServiceInfo().getSslClientKeyStore());
-            keyStore.load(clientKeyPair, deviceConfig
+                    alexaConfig.getCompanionServiceInfo().getSslClientKeyStore());
+            keyStore.load(clientKeyPair, alexaConfig
                     .getCompanionServiceInfo()
                     .getSslClientKeyStorePassphrase()
                     .toCharArray());
@@ -114,7 +114,7 @@ public class CompanionServiceClient {
             // Create a TrustManagerFactory with the client key pair KeyStore
             KeyManagerFactory keyManagerFactory =
                     KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            keyManagerFactory.init(keyStore, deviceConfig
+            keyManagerFactory.init(keyStore, alexaConfig
                     .getCompanionServiceInfo()
                     .getSslClientKeyStorePassphrase()
                     .toCharArray());
@@ -145,8 +145,8 @@ public class CompanionServiceClient {
      */
     public CompanionServiceRegCodeResponse getRegistrationCode() throws IOException {
         Map<String, String> queryParameters = new HashMap<String, String>();
-        queryParameters.put(AuthConstants.PRODUCT_ID, deviceConfig.getProductId());
-        queryParameters.put(AuthConstants.DSN, deviceConfig.getDsn());
+        queryParameters.put(AuthConstants.PRODUCT_ID, alexaConfig.getProductId());
+        queryParameters.put(AuthConstants.DSN, alexaConfig.getDsn());
 
         JsonObject response = callService("/provision/regCode", queryParameters);
 
@@ -184,7 +184,7 @@ public class CompanionServiceClient {
         InputStream response = null;
         try {
             String queryString = mapToQueryString(parameters);
-            URL obj = new URL(deviceConfig.getCompanionServiceInfo().getServiceUrl(),
+            URL obj = new URL(alexaConfig.getCompanionServiceInfo().getServiceUrl(),
                     path + queryString);
             con = (HttpURLConnection) obj.openConnection();
 

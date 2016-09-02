@@ -8,9 +8,8 @@
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
  * Software.
- *
  */
-package com.whyjustin.magicmirror.alexa;
+package com.whyjustin.magicmirror.sphinx;
 
 import java.io.IOException;
 
@@ -18,18 +17,18 @@ import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.api.LiveSpeechRecognizer;
 import org.apache.commons.lang3.StringUtils;
 
-public class VoicePatternTrigger
+public class SphinxClient
 {
-  private final MagicMirrorProxy magicMirrorProxy;
+  private final SphinxProxy sphinxProxy;
   private final Configuration configuration;
 
-  public VoicePatternTrigger(MagicMirrorProxy magicMirrorProxy, String dictionaryPath, String languageModelPath) {
-    this.magicMirrorProxy = magicMirrorProxy;
+  public SphinxClient(SphinxConfig sphinxConfig, SphinxProxy sphinxProxy) {
+    this.sphinxProxy = sphinxProxy;
     configuration = new Configuration();
 
     configuration.setAcousticModelPath("resource:/edu/cmu/sphinx/models/en-us/en-us");
-    configuration.setDictionaryPath("file:" + dictionaryPath);
-    configuration.setLanguageModelPath("file:" + languageModelPath);
+    configuration.setDictionaryPath("file:" + sphinxConfig.getDictionaryPath());
+    configuration.setLanguageModelPath("file:" + sphinxConfig.getLanguageModelPath());
   }
 
   public void listen() throws IOException {
@@ -38,7 +37,7 @@ public class VoicePatternTrigger
     while (true) {
       String utterance = recognizer.getResult().getHypothesis();
       if (!StringUtils.isEmpty(utterance)) {
-        magicMirrorProxy.handleCommand(utterance);
+        sphinxProxy.handleCommand(utterance);
         break;
       }
     }

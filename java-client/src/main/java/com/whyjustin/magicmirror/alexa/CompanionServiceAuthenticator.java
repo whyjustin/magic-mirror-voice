@@ -34,7 +34,6 @@ import java.util.TimerTask;
 import com.amazon.alexa.avs.auth.OAuth2AccessToken;
 import com.amazon.alexa.avs.auth.companionservice.CompanionServiceClient;
 import com.amazon.alexa.avs.auth.companionservice.CompanionServiceRegCodeResponse;
-import com.amazon.alexa.avs.config.DeviceConfig;
 
 /**
  * Authenticator for Companion Service. Will only work in a single tenanted environment, in particular the instance
@@ -42,7 +41,7 @@ import com.amazon.alexa.avs.config.DeviceConfig;
  */
 public class CompanionServiceAuthenticator
 {
-  private final DeviceConfig deviceConfig;
+  private final AlexaConfig alexaConfig;
 
   private final CompanionServiceClient serviceClient;
 
@@ -52,9 +51,9 @@ public class CompanionServiceAuthenticator
 
   private String sessionId;
 
-  public CompanionServiceAuthenticator(final DeviceConfig deviceConfig) {
-    this.deviceConfig = deviceConfig;
-    serviceClient = new CompanionServiceClient(deviceConfig);
+  public CompanionServiceAuthenticator(final AlexaConfig alexaConfig) {
+    this.alexaConfig = alexaConfig;
+    serviceClient = new CompanionServiceClient(alexaConfig);
     refreshTimer = new Timer();
   }
 

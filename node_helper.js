@@ -15,31 +15,63 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 const NodeHelper = require('node_helper');
-const alexaCompanionService = require('./alexa-companion-service/alexa-companion-service');
+const bootstrap = require('./magic-mirror-voice-bootstrap');
 const alexaJavaClientFactory = require('./alexa-java-client/alexa-java-client');
+const sphinxJavaClientFactory = require('./sphinx-java-client/sphinx-java-client');
 
 var isLoaded = false;
-var runtime = {};
-var client = undefined;
+var runtime = {
+  isLoading: false,
+  isRegistered: false,
+  registrationCode: undefined,
+  registrationUrl: undefined
+};
+var alexaJavaClient = undefined;
+var sphinxJavaClient = undefined;
 
 module.exports = NodeHelper.create({
   socketNotificationReceived: function(notification, payload) {
     var self = this;
     if (notification === 'INIT') {
       self.config = payload;
+      runtime.isLoading = true;
+      self.sendSocketNotification('UPDATE_DOM', runtime);
+
       if (!isLoaded) {
         isLoaded = true;
-        alexaCompanionService(self.config).then(function() {
-          client = alexaJavaClientFactory.get();
-          client.boot(self);
+
+        bootstrap(self.config).then(function(java) {
+          alexaJavaClient = alexaJavaClientFactory.get();
+          alexaJavaClient.boot(java, self.config, {
+            handleRegistrationCode: function(registrationCode) {
+              self.handleRegistrationCode(registrationCode);
+            },
+            handleToken: function(token) {
+              self.handleToken(token);
+            },
+            handleAlexaCompleted: function() {
+
+            }
+          });
+
+          sphinxJavaClient = sphinxJavaClientFactory.get();
+          sphinxJavaClient.boot(java, self.config, {
+            handleCommand: function(command) {
+              self.handleCommand(command);
+            }
+          }).then(function() {
+            sphinxJavaClient.listen();
+          });
+
+          runtime.isLoading = false;
+          self.sendSocketNotification('UPDATE_DOM', runtime);
         });
       }
     }
   },
-  handleRegistrationCode: function(code) {
+  handleRegistrationCode: function(registrationCode) {
     var self = this;
-    runtime.isRegistered = false;
-    runtime.registrationCode = code;
+    runtime.registrationCode = registrationCode;
     runtime.registrationUrl = self.config.companion.serviceUrl + '/provision/' + runtime.registrationCode;
     console.info('Register Alexa Java Client by navigating to ' + runtime.registrationUrl);
     self.sendSocketNotification('UPDATE_DOM', runtime);
@@ -58,7 +90,7 @@ module.exports = NodeHelper.create({
           var action = self.config.commands.patterns[pattern];
 
           if (action === 'alexa') {
-            client.triggerAlexa();
+            alexaJavaClient.triggerAlexa();
           }
         }
       }

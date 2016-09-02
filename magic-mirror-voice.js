@@ -33,7 +33,13 @@ Module.register('magic-mirror-voice', {
 
     var wrapper = document.createElement('div');
 
-    if (!runtime.isRegistered && runtime.registrationUrl) {
+    if (runtime.isLoading) {
+      var loading = document.createElement('div');
+      loading.innerHTML = 'Loading ...';
+      wrapper.className = "small dimmed";
+      wrapper.appendChild(loading);
+    }
+    else if (!runtime.isRegistered && runtime.registrationUrl) {
       var registerLink = document.createElement('div');
       registerLink.innerHTML = runtime.registrationUrl;
       wrapper.appendChild(registerLink);

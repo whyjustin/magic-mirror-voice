@@ -35,36 +35,30 @@ import com.amazon.alexa.avs.DialogRequestIdAuthority;
 import com.amazon.alexa.avs.ExpectSpeechListener;
 import com.amazon.alexa.avs.RecordingRMSListener;
 import com.amazon.alexa.avs.RequestListener;
-import com.amazon.alexa.avs.config.DeviceConfig;
+import com.amazon.alexa.avs.auth.companionservice.CompanionServiceRegCodeResponse;
 import com.amazon.alexa.avs.http.AVSClientFactory;
 
-public class MagicMirror
+public class AlexaClient
     implements ExpectSpeechListener, RecordingRMSListener
 {
-  private final VoicePatternTrigger voicePatternTrigger;
-
   private final AVSController avsController;
   private final CompanionServiceAuthenticator companionServiceAuthenticator;
-  private final MagicMirrorProxy magicMirrorProxy;
+  private final AlexaProxy alexaProxy;
 
   private Thread autoEndpoint = null;
   private static final int ENDPOINT_THRESHOLD = 5;
   private static final int ENDPOINT_SECONDS = 2;
 
-  public MagicMirror(DeviceConfig deviceConfig, VoicePatternConfig voicePatternConfig,
-                     MagicMirrorProxy magicMirrorProxy) throws Exception
+  public AlexaClient(AlexaConfig alexaConfig, AlexaProxy alexaProxy) throws Exception
   {
-    this.magicMirrorProxy = magicMirrorProxy;
-
-    voicePatternTrigger = new VoicePatternTrigger(magicMirrorProxy,
-        voicePatternConfig.getDictionaryPath(), voicePatternConfig.getLanguageModelPath());
+    this.alexaProxy = alexaProxy;
 
     avsController = new AVSController(this, new AVSAudioPlayerFactory(), new AlertManagerFactory(),
-        new AVSClientFactory(deviceConfig), DialogRequestIdAuthority.getInstance());
+        new AVSClientFactory(alexaConfig), DialogRequestIdAuthority.getInstance());
 
-    companionServiceAuthenticator = new CompanionServiceAuthenticator(deviceConfig);
+    companionServiceAuthenticator = new CompanionServiceAuthenticator(alexaConfig);
     String registrationCode = companionServiceAuthenticator.requestRegistrationCode();
-    magicMirrorProxy.handleRegistrationCode(registrationCode);
+    alexaProxy.handleRegistrationCode(registrationCode);
 
     avsController.startHandlingDirectives();
   }
@@ -72,7 +66,7 @@ public class MagicMirror
   public void registerDevice() throws IOException {
     String token = companionServiceAuthenticator.requestAccessToken();
     avsController.onAccessTokenReceived(token);
-    magicMirrorProxy.handleToken(token);
+    alexaProxy.handleToken(token);
   }
 
   public void triggerAlexa() {
@@ -81,21 +75,17 @@ public class MagicMirror
       @Override
       public void onRequestSuccess() {
         avsController.processingFinished();
-        magicMirrorProxy.handleAlexaCompleted();
+        alexaProxy.handleAlexaCompleted();
       }
 
       @Override
       public void onRequestError(Throwable e) {
         avsController.processingFinished();
-        magicMirrorProxy.handleAlexaCompleted();
+        alexaProxy.handleAlexaCompleted();
       }
     };
 
     avsController.startRecording(this, requestListener);
-  }
-
-  public void listen() throws IOException {
-    voicePatternTrigger.listen();
   }
 
   @Override
