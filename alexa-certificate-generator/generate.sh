@@ -4,15 +4,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd $SCRIPT_DIR
 
-echo -n "Product ID: "
-read productId
-
-echo -n "Serial Number: "
-read dsn
-
-echo -n "Password for Keystores (won't echo): "
-read -s password
-
 mkdir -p certs/ca/
 mkdir -p certs/server/
 mkdir -p certs/client/

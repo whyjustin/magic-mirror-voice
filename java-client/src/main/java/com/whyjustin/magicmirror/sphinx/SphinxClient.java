@@ -41,8 +41,11 @@ public class SphinxClient
   }
 
   public void listen() {
-    recognizer.startRecognition();
+    if (isListening) {
+      return;
+    }
     isListening = true;
+    recognizer.startRecognition();
 
     while (true) {
       String utterance = recognizer.getResult().getHypothesis();

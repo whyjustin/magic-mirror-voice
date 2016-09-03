@@ -14,11 +14,11 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-const Promise = require("bluebird");
-const lmtool = require('lmtool');
-const fs = require('fs');
-
 function sphinxModelGenerator(config) {
+  const Promise = require('bluebird');
+  const lmtool = require('lmtool');
+  const fs = require('fs');
+
   return new Promise(function(resolve, reject) {
     var needsGeneration = false;
     fs.access(__dirname + '/commands.dic', function(err) {
@@ -51,58 +51,58 @@ function sphinxModelGenerator(config) {
       });
     });
   });
-}
 
-/**
- * Generate a language model for the desired Magic Mirror commands. This will be used by Sphinx to only try
- * to recognize words from this dictionary.
- */
-function _generateLanguageModel(config) {
-  return new Promise(function(resolve) {
-    var dictionary = [];
-    for (var key in config.sphinx.commands) {
-      if (config.sphinx.commands.hasOwnProperty(key)) {
-        dictionary.push(key);
-      }
-    }
-
-    lmtool(dictionary, function(err, filename) {
-      fs.renameSync(filename + '.dic', __dirname + '/commands.dic');
-      fs.renameSync(filename + '.lm', __dirname + '/commands.lm');
-
-      fs.unlink(filename + '.log_pronounce');
-      fs.unlink(filename + '.sent');
-      fs.unlink(filename + '.vocab');
-      fs.unlink('TAR' + filename + '.tgz');
-
-      config.sphinx.dictionary = __dirname + '/commands.dic';
-      config.sphinx.model = __dirname + '/commands.lm';
-      resolve();
-    });
-  })
-}
-
-/**
- * Generate a Sphinx Configuration file with appropriate logLevel
- */
-function _buildSphinxConfiguration(config) {
-  return new Promise(function(resolve, reject) {
-    if (!config.sphinx.configuration) {
-      const configuration = __dirname + '/config.xml';
-      var logLevel = config.sphinx.logLevel || 'WARNING';
-
-      var xml = '<?xml version="1.0"?><config><property name="logLevel" value="' + logLevel + '"/></config>';
-      fs.writeFile(configuration, xml, function(error) {
-        if (error) {
-          reject(error);
-          return;
+  /**
+   * Generate a language model for the desired Magic Mirror commands. This will be used by Sphinx to only try
+   * to recognize words from this dictionary.
+   */
+  function _generateLanguageModel(config) {
+    return new Promise(function(resolve) {
+      var dictionary = [];
+      for (var key in config.sphinx.commands) {
+        if (config.sphinx.commands.hasOwnProperty(key)) {
+          dictionary.push(key);
         }
+      }
 
-        config.sphinx.configuration = configuration;
+      lmtool(dictionary, function(err, filename) {
+        fs.renameSync(filename + '.dic', __dirname + '/commands.dic');
+        fs.renameSync(filename + '.lm', __dirname + '/commands.lm');
+
+        fs.unlink(filename + '.log_pronounce');
+        fs.unlink(filename + '.sent');
+        fs.unlink(filename + '.vocab');
+        fs.unlink('TAR' + filename + '.tgz');
+
+        config.sphinx.dictionary = __dirname + '/commands.dic';
+        config.sphinx.model = __dirname + '/commands.lm';
         resolve();
       });
-    }
-  });
+    })
+  }
+
+  /**
+   * Generate a Sphinx Configuration file with appropriate logLevel
+   */
+  function _buildSphinxConfiguration(config) {
+    return new Promise(function(resolve, reject) {
+      if (!config.sphinx.configuration) {
+        const configuration = __dirname + '/config.xml';
+        var logLevel = config.sphinx.logLevel || 'WARNING';
+
+        var xml = '<?xml version="1.0"?><config><property name="logLevel" value="' + logLevel + '"/></config>';
+        fs.writeFile(configuration, xml, function(error) {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          config.sphinx.configuration = configuration;
+          resolve();
+        });
+      }
+    });
+  }
 }
 
 module.exports = {
