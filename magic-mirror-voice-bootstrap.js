@@ -18,41 +18,45 @@ const Promise = require("bluebird");
 const childProcess = require('child_process');
 const java = require('java');
 const fs = require('fs');
+const sphinxModelGenerator = require('./sphinx-model-generator/sphinx-model-generator');
 
 function bootstrapJava(config) {
   return new Promise(function(resolve, reject) {
-    childProcess.exec(
-        'mvn compile dependency:copy-dependencies -f ' + __dirname + '/java-client/pom.xml -Dalpn-boot.version=' +
-        config.client.alpnVersion, function(error, stdout, stderr) {
-          if (error) {
-            console.error('Unable to compile Alexa Java Client: ' + error);
-            reject(error);
-            return;
-          }
+    sphinxModelGenerator.generate(config).then(function() {
+      childProcess.exec(
+          'mvn compile dependency:copy-dependencies -f ' + __dirname + '/java-client/pom.xml -Dalpn-boot.version=' +
+          config.client.alpnVersion, function(error, stdout, stderr) {
+            if (error) {
+              console.error('Unable to compile Alexa Java Client: ' + error);
+              reject(error);
+              return;
+            }
 
-          process.env['VLC_PATH'] = config.client.vlcPath;
-          process.env['VLC_PLUGIN_PATH'] = config.client.vlcPluginPath;
+            process.env['VLC_PATH'] = config.client.vlcPath;
+            process.env['VLC_PLUGIN_PATH'] = config.client.vlcPluginPath;
 
-          java.options.push(
-              '-Xbootclasspath/p:' + __dirname + '/java-client/target/dependency/alpn-boot-' + config.client.alpnVersion +
-              '.jar');
-          java.options.push('-Djna.library.path=' + config.client.vlcPath);
-          java.options.push('-Xrs');
+            java.options.push(
+                '-Xbootclasspath/p:' + __dirname + '/java-client/target/dependency/alpn-boot-' +
+                config.client.alpnVersion +
+                '.jar');
+            java.options.push('-Djna.library.path=' + config.client.vlcPath);
+            java.options.push('-Xrs');
 
-          if (config.debug) {
-            java.options.push('-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005');
-          }
+            if (config.debug) {
+              java.options.push('-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005');
+            }
 
-          const baseDir = __dirname + '/java-client/target/dependency';
-          const dependencies = fs.readdirSync(baseDir);
-          dependencies.forEach(function(dependency) {
-            java.classpath.push(baseDir + "/" + dependency);
+            const baseDir = __dirname + '/java-client/target/dependency';
+            const dependencies = fs.readdirSync(baseDir);
+            dependencies.forEach(function(dependency) {
+              java.classpath.push(baseDir + "/" + dependency);
+            });
+
+            java.classpath.push(__dirname + '/java-client/target/classes');
+
+            resolve(java);
           });
-
-          java.classpath.push(__dirname + '/java-client/target/classes');
-
-          resolve(java);
-        });
+    });
   });
 }
 

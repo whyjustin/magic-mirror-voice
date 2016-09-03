@@ -23,6 +23,7 @@ var isLoaded = false;
 var runtime = {
   isLoading: false,
   isRegistered: false,
+  isAlexaSpeaking: false,
   registrationCode: undefined,
   registrationUrl: undefined
 };
@@ -48,6 +49,7 @@ module.exports = NodeHelper.create({
             },
             onAccessToken: function(token) {
               self.handleAccessToken(token);
+              self.firstListen();
             },
             onAlexaCompleted: function() {
 
@@ -66,7 +68,7 @@ module.exports = NodeHelper.create({
               self.handleCommand(command);
             }
           }).then(function() {
-            sphinxJavaClient.listen();
+            self.firstListen();
           });
 
           runtime.isLoading = false;
@@ -74,6 +76,27 @@ module.exports = NodeHelper.create({
         });
       }
     }
+  },
+  firstListen: function() {
+    var self = this;
+    if (runtime.isRegistered) {
+      sphinxJavaClient.listen();
+      self.heartBeat();
+    }
+  },
+  // Recover from any failures by checking Sphinx every 10 seconds
+  heartBeat: function() {
+    setInterval(function() {
+      if (!runtime.isAlexaSpeaking) {
+        sphinxJavaClient.isListening().then(function(isListening) {
+          if (!runtime.isAlexaSpeaking) {
+            if (!isListening) {
+              sphinxJavaClient.listen();
+            }
+          }
+        });
+      }
+    }, 1000 * 10);
   },
   handleRegistrationCode: function(registrationCode) {
     var self = this;
@@ -89,23 +112,31 @@ module.exports = NodeHelper.create({
     self.sendSocketNotification('UPDATE_DOM', runtime);
   },
   handleAlexaSpeechStarted: function() {
+    runtime.isAlexaSpeaking = true;
     sphinxJavaClient.stop();
   },
   handleAlexaSpeechFinished: function() {
+    runtime.isAlexaSpeaking = false;
+    runtime.isAlexaTriggered = false;
     sphinxJavaClient.listen();
   },
   handleCommand: function(command) {
     var self = this;
-    for (var pattern in self.config.commands.patterns) {
-      if (self.config.commands.patterns.hasOwnProperty(pattern)) {
-        if (pattern.toLowerCase() === command.toLowerCase()) {
-          var action = self.config.commands.patterns[pattern];
+    var alexaTriggered = false;
+    for (var command in self.config.sphinx.commands) {
+      if (self.config.sphinx.commands.hasOwnProperty(command)) {
+        if (command.toLowerCase() === command.toLowerCase()) {
+          var action = self.config.sphinx.commands[command];
 
           if (action === 'alexa') {
+            alexaTriggered = true;
             alexaJavaClient.triggerAlexa();
           }
         }
       }
+    }
+    if (!alexaTriggered) {
+      sphinxJavaClient.listen();
     }
   }
 });

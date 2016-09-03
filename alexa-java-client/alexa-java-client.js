@@ -68,6 +68,7 @@ function AlexaJavaClient() {
       return;
     }
 
+    console.trace('Alexa Triggered');
     self.java.callMethod(self.alexaClient, 'triggerAlexa', function(error) {
       if (error) {
         console.error('Unable to run trigger Alexa in Alexa Java Client:' + error);

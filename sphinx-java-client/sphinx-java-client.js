@@ -22,6 +22,7 @@ function SphinxJavaClient() {
   self.boot = boot;
   self.listen = listen;
   self.stop = stop;
+  self.isListening = isListening;
 
   function boot(java, config, proxy) {
     self.java = java;
@@ -32,7 +33,7 @@ function SphinxJavaClient() {
         self.java.newInstance('com.whyjustin.magicmirror.sphinx.SphinxClient', sphinxConfig, sphinxProxy,
             function(error, sphinxClient) {
               if (error) {
-                console.error('Unable to run Alexa Java Client:' + error);
+                console.error('Unable to run Sphinx Java Client:' + error);
                 return;
               }
 
@@ -42,7 +43,7 @@ function SphinxJavaClient() {
               resolve();
             });
       }).catch(function(error) {
-        console.error('Unable to run Alexa Java Client: ' + error);
+        console.error('Unable to run Sphinx Java Client: ' + error);
         reject(error);
       });
     });
@@ -54,6 +55,7 @@ function SphinxJavaClient() {
       return;
     }
 
+    console.trace('Listen Triggered');
     self.java.callMethod(self.sphinxClient, 'listen', function(error) {
       if (error) {
         console.error('Unable to run Listen in Sphinx Java Client:' + error);
@@ -76,10 +78,27 @@ function SphinxJavaClient() {
     });
   }
 
+  function isListening() {
+    return new Promise(function(resolve, reject) {
+      if (!self.isBooted) {
+        console.error('Must boot client via boot(config, proxy) before accessing');
+        reject();
+      }
+
+      self.java.callMethod(self.sphinxClient, 'isListening', function(error, isListening) {
+        if (error) {
+          console.error('Unable to run Stop in Sphinx Java Client:' + error);
+          reject();
+        }
+        resolve(isListening);
+      });
+    });
+  }
+
   function _buildSphinxConfig(config) {
     return new Promise(function(resolve, reject) {
-      self.java.newInstance('com.whyjustin.magicmirror.sphinx.SphinxConfig', config.commands.dictionary,
-          config.commands.model, function(error, sphinxConfig) {
+      self.java.newInstance('com.whyjustin.magicmirror.sphinx.SphinxConfig', config.sphinx.dictionary,
+          config.sphinx.model, function(error, sphinxConfig) {
             if (error) {
               reject(error);
               return;

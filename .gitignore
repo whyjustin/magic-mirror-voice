@@ -3,5 +3,6 @@
 certs/
 target/
 node_modules/
-sphinx-model-generator/commands.dic
-sphinx-model-generator/commands.lm
+
+sphinx-model-generator/
+sphinx-model-generator/!*.js

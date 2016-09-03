@@ -70,6 +70,7 @@ public class AlexaClient
   }
 
   public void triggerAlexa() {
+
     avsController.onUserActivity();
     RequestListener requestListener = new RequestListener() {
       @Override

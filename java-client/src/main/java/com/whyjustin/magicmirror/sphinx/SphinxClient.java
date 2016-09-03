@@ -14,26 +14,16 @@ package com.whyjustin.magicmirror.sphinx;
 import java.io.IOException;
 
 import edu.cmu.sphinx.api.Configuration;
-import edu.cmu.sphinx.recognizer.Recognizer.State;
-import edu.cmu.sphinx.recognizer.StateListener;
-import edu.cmu.sphinx.util.props.PropertyException;
-import edu.cmu.sphinx.util.props.PropertySheet;
 import org.apache.commons.lang3.StringUtils;
 
 public class SphinxClient
-    implements StateListener
 {
   private final SphinxProxy sphinxProxy;
   private final Configuration configuration;
 
-  private SphinxMirrorRecognizer recognizer;
+  private boolean isListening = false;
 
-  private DesiredState desiredState;
-  private enum DesiredState {
-    NONE,
-    START,
-    STOP
-  }
+  private SphinxMirrorRecognizer recognizer;
 
   public SphinxClient(SphinxConfig sphinxConfig, SphinxProxy sphinxProxy) throws IOException {
     this.sphinxProxy = sphinxProxy;
@@ -42,63 +32,31 @@ public class SphinxClient
     configuration.setAcousticModelPath("resource:/edu/cmu/sphinx/models/en-us/en-us");
     configuration.setDictionaryPath("file:" + sphinxConfig.getDictionaryPath());
     configuration.setLanguageModelPath("file:" + sphinxConfig.getLanguageModelPath());
+
     recognizer = new SphinxMirrorRecognizer(configuration);
-    recognizer.addStateListener(this);
+  }
+
+  public boolean isListening() {
+    return isListening;
   }
 
   public void listen() {
-    desiredState = DesiredState.START;
-    if (recognizer.getState() == State.DEALLOCATED) {
-      doListen();
+    recognizer.startRecognition();
+    isListening = true;
+
+    while (true) {
+      String utterance = recognizer.getResult().getHypothesis();
+      if (!StringUtils.isEmpty(utterance)) {
+        sphinxProxy.handleCommand(utterance);
+        break;
+      }
     }
+    recognizer.stopRecognition();
+    isListening = false;
   }
 
   public void stop() {
-    desiredState = DesiredState.STOP;
-    if (recognizer.getState() == State.READY) {
-      doStop();
-    }
-  }
-
-  private void doListen() {
-    try {
-      recognizer.startRecognition(true);
-      desiredState = DesiredState.NONE;
-
-      while (true) {
-        String utterance = recognizer.getResult().getHypothesis();
-        if (!StringUtils.isEmpty(utterance)) {
-          sphinxProxy.handleCommand(utterance);
-          break;
-        }
-      }
-      recognizer.stopRecognition();
-    }
-    catch (IllegalStateException ex) {
-    }
-  }
-
-  private void doStop() {
-    try {
-      recognizer.stopRecognition();
-      desiredState = DesiredState.NONE;
-    }
-    catch (IllegalStateException ex) {
-    }
-  }
-
-  @Override
-  public void statusChanged(final State status) {
-    if (desiredState == DesiredState.STOP && status == State.READY) {
-      doStop();
-    }
-    else if (desiredState == DesiredState.START && status == State.DEALLOCATED) {
-      doListen();
-    }
-  }
-
-  @Override
-  public void newProperties(final PropertySheet ps) throws PropertyException {
-
+    recognizer.stopRecognition();
+    isListening = false;
   }
 }
