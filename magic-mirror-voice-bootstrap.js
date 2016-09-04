@@ -29,8 +29,12 @@ function bootstrapJava(config) {
             const childProcess = require('child_process');
 
             childProcess.exec(
-                'mvn compile dependency:copy-dependencies -f ' + __dirname + '/java-client/pom.xml -Dalpn-boot.version=' +
-                config.client.alpnVersion, function(error, stdout, stderr) {
+                'mvn compile dependency:copy-dependencies -f ' + __dirname +
+                '/java-client/pom.xml -Dalpn-boot.version=' +
+                config.client.alpnVersion, {
+                  maxBuffer: 1024 * 1000
+                },
+                function(error, stdout, stderr) {
                   if (error) {
                     console.error('Unable to compile Alexa Java Client: ' + error);
                     reject(error);

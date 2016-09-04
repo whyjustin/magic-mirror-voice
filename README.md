@@ -1,6 +1,27 @@
+## Installation
+
+A good deal of the installation is bootstrapped in the run process. This causes a long load time in favor of less
+configuration. By default the only requirement for installation is npm install.
+
 ## Installation Notes
 
-Special requirements for [npm java package](https://www.npmjs.com/package/java)
+Electron is not always using the save version of node as installed on your device. npm install will compile native
+modules to the global version of node which may cause issues when running in electron. If you are using the electron
+version (this is the default) of Magic Mirror, this will cause issues.
+
+**NOTE: The following instructions are arguably more difficult that running Magic Mirror in serveronly mode and
+displaying the mirror in a full screen browser.**
+
+There is a work around, but pending a resolution to https://github.com/joeferner/node-java/issues/344, this involves 
+downgrading Magic Mirror's Electron client to 1.2.8 by adjusting the package.json and reinstalling npm dependencies. 
+After doing so, and installing the Magic Mirror Voice dependencies, running the following will clear up any errors.
+
+```
+./node_modules/.bin/electron-rebuild -v=1.2.8 
+```
+
+Hopefully the team at node-java will issue a fix to prevent the need to downgrade Electron, the rebuild will still be
+necessary.
 
 ## Sample Configuration
 
