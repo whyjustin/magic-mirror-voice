@@ -14,6 +14,7 @@ package com.whyjustin.magicmirror.sphinx;
 import java.io.IOException;
 
 import edu.cmu.sphinx.api.Configuration;
+import edu.cmu.sphinx.recognizer.Recognizer.State;
 import org.apache.commons.lang3.StringUtils;
 
 public class SphinxClient
@@ -41,7 +42,7 @@ public class SphinxClient
   }
 
   public void listen() {
-    if (isListening) {
+    if (isListening || recognizer.getState() == State.RECOGNIZING) {
       return;
     }
     isListening = true;

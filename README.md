@@ -36,7 +36,9 @@ var magicMirrorVoiceConfig = {
     },
     sphinx: {
       commands: {
-        "mirror mirror": "alexa"
+        "mirror mirror": {
+          action: 'alexa'
+        }
       },
       dictionary: './commands.dic', // Optional
       model: './commands.lm' // Optional

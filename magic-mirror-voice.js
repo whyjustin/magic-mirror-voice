@@ -25,6 +25,10 @@ Module.register('magic-mirror-voice', {
     self.runtime = payload;
     if (notification === 'UPDATE_DOM') {
       self.updateDom();
+    } else if (notification === 'SEND_NOTIFICATION') {
+      this.sendNotification(payload.notification, payload.payload);
+      console.log(payload.notification);
+      console.log(payload.payload);
     }
   },
   getDom: function() {

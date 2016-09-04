@@ -59,6 +59,7 @@ import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.api.LiveSpeechRecognizer;
 import edu.cmu.sphinx.api.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
+import edu.cmu.sphinx.recognizer.Recognizer.State;
 
 public class SphinxMirrorRecognizer
     extends AbstractSpeechRecognizer
@@ -80,6 +81,10 @@ public class SphinxMirrorRecognizer
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       recognizer.deallocate();
     }));
+  }
+
+  public State getState() {
+    return super.recognizer.getState();
   }
 
   /**

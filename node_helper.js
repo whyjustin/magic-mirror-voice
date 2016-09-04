@@ -49,7 +49,6 @@ module.exports = NodeHelper.create({
             },
             onAccessToken: function(token) {
               self.handleAccessToken(token);
-              self.firstListen();
             },
             onAlexaCompleted: function() {
 
@@ -68,20 +67,14 @@ module.exports = NodeHelper.create({
               self.handleCommand(command);
             }
           }).then(function() {
-            self.firstListen();
+            sphinxJavaClient.listen();
+            self.heartBeat();
           });
 
           runtime.isLoading = false;
           self.sendSocketNotification('UPDATE_DOM', runtime);
         });
       }
-    }
-  },
-  firstListen: function() {
-    var self = this;
-    if (runtime.isRegistered) {
-      sphinxJavaClient.listen();
-      self.heartBeat();
     }
   },
   // Recover from any failures by checking Sphinx every 10 seconds
@@ -120,17 +113,22 @@ module.exports = NodeHelper.create({
     runtime.isAlexaTriggered = false;
     sphinxJavaClient.listen();
   },
-  handleCommand: function(command) {
+  handleCommand: function(requestedCommand) {
     var self = this;
     var alexaTriggered = false;
-    for (var command in self.config.sphinx.commands) {
-      if (self.config.sphinx.commands.hasOwnProperty(command)) {
-        if (command.toLowerCase() === command.toLowerCase()) {
-          var action = self.config.sphinx.commands[command];
+    for (var commandKey in self.config.sphinx.commands) {
+      if (self.config.sphinx.commands.hasOwnProperty(commandKey)) {
+        if (commandKey.toLowerCase() === requestedCommand.toLowerCase()) {
+          var command = self.config.sphinx.commands[commandKey];
+          var action = command.action;
 
           if (action === 'alexa') {
-            alexaTriggered = true;
-            alexaJavaClient.triggerAlexa();
+            if (runtime.isRegistered) {
+              alexaTriggered = true;
+              alexaJavaClient.triggerAlexa();
+            }
+          } else if (action == 'sendNotification') {
+            self.sendSocketNotification('SEND_NOTIFICATION', command);
           }
         }
       }
