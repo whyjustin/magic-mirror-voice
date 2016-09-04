@@ -13,6 +13,8 @@ package com.whyjustin.magicmirror.sphinx;
 
 import java.io.IOException;
 
+import javax.sound.sampled.LineUnavailableException;
+
 import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.recognizer.Recognizer.State;
 import org.apache.commons.lang3.StringUtils;
@@ -41,22 +43,23 @@ public class SphinxClient
     return isListening;
   }
 
-  public void listen() {
+  public void listen() throws IOException, LineUnavailableException {
     if (isListening || recognizer.getState() == State.RECOGNIZING) {
       return;
     }
     isListening = true;
     recognizer.startRecognition();
 
+    String utterance;
     while (true) {
-      String utterance = recognizer.getResult().getHypothesis();
+      utterance = recognizer.getResult().getHypothesis();
       if (!StringUtils.isEmpty(utterance)) {
-        sphinxProxy.handleCommand(utterance);
         break;
       }
     }
     recognizer.stopRecognition();
     isListening = false;
+    sphinxProxy.handleCommand(utterance);
   }
 
   public void stop() {

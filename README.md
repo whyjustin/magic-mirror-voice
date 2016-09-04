@@ -5,7 +5,7 @@ configuration. By default the only requirement for installation is npm install.
 
 ## Installation Notes
 
-Electron is not always using the save version of node as installed on your device. npm install will compile native
+Electron is not always using the same version of node as installed on your device. npm install will compile native
 modules to the global version of node which may cause issues when running in electron. If you are using the electron
 version (this is the default) of Magic Mirror, this will cause issues.
 
@@ -31,16 +31,16 @@ var magicMirrorVoiceConfig = {
   header: 'Magic Mirror Voice',
   position: 'top_right',
   config: {
-    debug: true,
+    debug: true, // Optional
     alexa: {
       productId: 'productId',
       dsn: 'dsn'
     },
     ssl: {
-      sslCaCert: './magic-mirror-voice/alexa-certificate-generator/certs/ca/ca.crt',  // Optional
-      sslKey: './magic-mirror-voice/alexa-certificate-generator/certs/server/node.key',  // Optional
-      sslCert: './magic-mirror-voice/alexa-certificate-generator/certs/server/node.crt',  // Optional
-      sslClientKeyStore: './magic-mirror-voice/alexa-certificate-generator/certs/client/client.pkcs12',  // Optional
+      sslCaCert: './magic-mirror-voice/alexa-certificate-generator/certs/ca/ca.crt', // Optional
+      sslKey: './magic-mirror-voice/alexa-certificate-generator/certs/server/node.key', // Optional
+      sslCert: './magic-mirror-voice/alexa-certificate-generator/certs/server/node.crt', // Optional
+      sslClientKeyStore: './magic-mirror-voice/alexa-certificate-generator/certs/client/client.pkcs12', // Optional
       sslClientKeyStorePassphrase: ''
     },
     companion: {

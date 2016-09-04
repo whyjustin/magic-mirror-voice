@@ -20,6 +20,7 @@ function AlexaJavaClient() {
 
   var self = this;
   self.java = undefined;
+  self.debug = false;
   self.isBooted = false;
   self.alexaClient = undefined;
   self.boot = boot;
@@ -28,6 +29,7 @@ function AlexaJavaClient() {
 
   function boot(java, config, proxy) {
     self.java = java;
+    self.debug = config.debug;
     alexaCompanionService(config).then(function() {
       _buildAlexConfig(config).then(function(alexaConfig) {
         var alexaProxy = self.java.newProxy('com.whyjustin.magicmirror.alexa.AlexaProxy', proxy);
@@ -68,7 +70,9 @@ function AlexaJavaClient() {
       return;
     }
 
-    console.trace('Alexa Triggered');
+    if (self.debug) {
+      console.trace('Alexa Triggered');
+    }
     self.java.callMethod(self.alexaClient, 'triggerAlexa', function(error) {
       if (error) {
         console.error('Unable to run trigger Alexa in Alexa Java Client:' + error);

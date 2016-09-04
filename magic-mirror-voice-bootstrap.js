@@ -15,7 +15,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 function bootstrapJava(config) {
-  const Promise = require("bluebird");
+  const Promise = require('bluebird');
   const java = require('java');
   const fs = require('fs');
   const alexaCertificateGenerator = require('./alexa-certificate-generator/alexa-certificate-generator');
@@ -25,7 +25,7 @@ function bootstrapJava(config) {
     alexaCertificateGenerator.generate(config).then(function() {
       sphinxModelGenerator.generate(config).then(function() {
         fs.access(__dirname + '/java-client/target/', function(err) {
-          if (err) {
+          if (err || config.debug) {
             const childProcess = require('child_process');
 
             childProcess.exec(

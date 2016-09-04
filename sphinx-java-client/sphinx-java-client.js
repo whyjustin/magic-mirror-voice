@@ -19,6 +19,7 @@ function SphinxJavaClient() {
   self.java = undefined;
   self.isBooted = false;
   self.sphinxClient = undefined;
+  self.debug = false;
   self.boot = boot;
   self.listen = listen;
   self.stop = stop;
@@ -26,6 +27,7 @@ function SphinxJavaClient() {
 
   function boot(java, config, proxy) {
     self.java = java;
+    self.debug = config.debug;
     return new Promise(function(resolve, reject) {
       _buildSphinxConfig(config).then(function(sphinxConfig) {
         var sphinxProxy = java.newProxy('com.whyjustin.magicmirror.sphinx.SphinxProxy', proxy);
@@ -55,7 +57,9 @@ function SphinxJavaClient() {
       return;
     }
 
-    console.trace('Listen Triggered');
+    if (self.debug) {
+      console.trace('Listen Triggered');
+    }
     self.java.callMethod(self.sphinxClient, 'listen', function(error) {
       if (error) {
         console.error('Unable to run Listen in Sphinx Java Client:' + error);
