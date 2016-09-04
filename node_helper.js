@@ -24,11 +24,13 @@ var runtime = {
   isLoading: false,
   isRegistered: false,
   isAlexaSpeaking: false,
+  isAlexaListening: false,
   registrationCode: undefined,
   registrationUrl: undefined
 };
 var alexaJavaClient = undefined;
 var sphinxJavaClient = undefined;
+var alexaListeningTimeout;
 
 module.exports = NodeHelper.create({
   socketNotificationReceived: function(notification, payload) {
@@ -77,19 +79,27 @@ module.exports = NodeHelper.create({
       }
     }
   },
-  // Recover from any failures by checking Sphinx every 10 seconds
+  // Recover from any failures by checking Sphinx every 30 seconds
   heartBeat: function() {
     setInterval(function() {
-      if (!runtime.isAlexaSpeaking) {
+      // There is a state the module can get into where the Alexa client listen() has been called but Alexa does not
+      // trigger speech started. This timeout will clear this state is if occurs for more than 30 seconds.
+      if (runtime.isAlexaListening) {
+        alexaListeningTimeout = setTimeout(function() {
+          runtime.isAlexaListening = false;
+        }, 30);
+      }
+
+      if (!runtime.isAlexaSpeaking && !runtime.isAlexaListening) {
         sphinxJavaClient.isListening().then(function(isListening) {
-          if (!runtime.isAlexaSpeaking) {
+          if (!runtime.isAlexaSpeaking && !runtime.isAlexaListening) {
             if (!isListening) {
               sphinxJavaClient.listen();
             }
           }
         });
       }
-    }, 1000 * 10);
+    }, 1000 * 30);
   },
   handleRegistrationCode: function(registrationCode) {
     var self = this;
@@ -106,16 +116,22 @@ module.exports = NodeHelper.create({
   },
   handleAlexaSpeechStarted: function() {
     runtime.isAlexaSpeaking = true;
+    runtime.isAlexaListening = false;
+    clearImmediate(alexaListeningTimeout);
+
     sphinxJavaClient.stop();
   },
   handleAlexaSpeechFinished: function() {
     runtime.isAlexaSpeaking = false;
     runtime.isAlexaTriggered = false;
+
     sphinxJavaClient.listen();
   },
   handleCommand: function(requestedCommand) {
     var self = this;
-    var alexaTriggered = false;
+    runtime.isAlexaListening = false;
+    clearImmediate(alexaListeningTimeout);
+
     for (var commandKey in self.config.sphinx.commands) {
       if (self.config.sphinx.commands.hasOwnProperty(commandKey)) {
         if (commandKey.toLowerCase() === requestedCommand.toLowerCase()) {
@@ -124,7 +140,7 @@ module.exports = NodeHelper.create({
 
           if (action === 'alexa') {
             if (runtime.isRegistered) {
-              alexaTriggered = true;
+              runtime.isAlexaListening = true;
               alexaJavaClient.triggerAlexa();
             }
           } else if (action == 'sendNotification') {
@@ -133,7 +149,7 @@ module.exports = NodeHelper.create({
         }
       }
     }
-    if (!alexaTriggered) {
+    if (!runtime.isAlexaListening) {
       sphinxJavaClient.listen();
     }
   }
