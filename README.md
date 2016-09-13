@@ -1,7 +1,16 @@
 ## Installation
 
 A good deal of the installation is bootstrapped in the run process. This causes a long load time in favor of less
-configuration. By default the only requirement for installation is npm install.
+configuration. There are a few steps that are required to get started, many similar to those required to configure
+Alexa for the Raspberry Pi.
+
+* Install VLC (https://github.com/alexa/alexa-avs-raspberry-pi#23---install-vlc)
+    * Environmental variables do not need to be configured as they are pulled from this modules JSON config
+* Install JDK (https://github.com/alexa/alexa-avs-raspberry-pi#43---install-java-development-kit)
+* Install Maven (https://github.com/alexa/alexa-avs-raspberry-pi#44---install-maven)
+* Register and configure Alexa Voice Service (https://github.com/alexa/alexa-avs-raspberry-pi#6---getting-started-with-alexa-voice-service)
+
+Once complete, fill in the required configuration JSON fields and run npm install from the module directory.
 
 ## Installation Notes
 
@@ -12,9 +21,10 @@ version (this is the default) of Magic Mirror, this will cause issues.
 **NOTE: The following instructions are arguably more difficult that running Magic Mirror in serveronly mode and
 displaying the mirror in a full screen browser.**
 
-There is a work around, but pending a resolution to https://github.com/joeferner/node-java/issues/344, this involves 
-downgrading Magic Mirror's Electron client to 1.2.8 by adjusting the package.json and reinstalling npm dependencies. 
-After doing so, and installing the Magic Mirror Voice dependencies, running the following will clear up any errors.
+There is a work around, but pending a resolution to [Issue #344](https://github.com/joeferner/node-java/issues/344), 
+this involves downgrading Magic Mirror's Electron client to 1.2.8 by adjusting the package.json and reinstalling npm 
+dependencies. After doing so, and installing the Magic Mirror Voice dependencies, running the following will clear up 
+any errors.
 
 ```
 ./node_modules/.bin/electron-rebuild -v=1.2.8 
@@ -22,6 +32,10 @@ After doing so, and installing the Magic Mirror Voice dependencies, running the 
 
 Hopefully the team at node-java will issue a fix to prevent the need to downgrade Electron, the rebuild will still be
 necessary.
+
+## Configuration
+
+This module relies heavily on the work done by Amazon to get Alexa Voice Services working on the Raspberry Pi.  
 
 ## Sample Configuration
 
