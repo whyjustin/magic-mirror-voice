@@ -5,8 +5,9 @@ configuration. There are a few steps that are required to get started, many simi
 Alexa for the Raspberry Pi.
 
 * Install VLC (https://github.com/alexa/alexa-avs-raspberry-pi#23---install-vlc)
-    * Environmental variables do not need to be configured as they are pulled from this modules JSON config
+    * Environmental variables do not need to be configured as they are pulled from this modules JSON config   
 * Install JDK (https://github.com/alexa/alexa-avs-raspberry-pi#43---install-java-development-kit)
+    * ALPN version must be set in this modules JSON config
 * Install Maven (https://github.com/alexa/alexa-avs-raspberry-pi#44---install-maven)
 * Register and configure Alexa Voice Service (https://github.com/alexa/alexa-avs-raspberry-pi#6---getting-started-with-alexa-voice-service)
 
