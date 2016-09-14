@@ -25,9 +25,13 @@ displaying the mirror in a full screen browser.**
 There is a work around, but pending a resolution to [Issue #344](https://github.com/joeferner/node-java/issues/344), 
 this involves downgrading Magic Mirror's Electron client to 1.2.8 by adjusting the package.json and reinstalling npm 
 dependencies. After doing so, and installing the Magic Mirror Voice dependencies, running the following will clear up 
-any errors.
+any errors. From the Magic Mirror home directory:
 
 ```
+sed -i 's/"electron-prebuilt": "latest"/"electron-prebuilt": "1.2.8"/g' package.json
+npm install
+cd modules/magic-mirror-voice
+npm install
 ./node_modules/.bin/electron-rebuild -v=1.2.8 
 ```
 
@@ -40,8 +44,10 @@ This module relies heavily on the work done by Amazon to get Alexa Voice Service
 
 ## Sample Configuration
 
+The following should go within the modules array of your config/config.json file.
+
 ```
-var magicMirrorVoiceConfig = {
+{
   module: 'magic-mirror-voice',
   header: 'Magic Mirror Voice',
   position: 'top_right',
