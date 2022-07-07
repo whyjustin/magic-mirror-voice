@@ -9,7 +9,7 @@
   <name>Voice Services for Magic Mirror 2</name>
 
   <properties>
-    <jetty.version>9.3.7.v20160115</jetty.version>
+    <jetty.version>10.0.10</jetty.version>
     <!-- The latest version of alpn-boot that supports JDK 1.8.0_71 through 1.8.0_74 -->
     <!-- To override, pass -Dalpn-boot.version=YOUR_VERSION when running "mvn install" and "mvn exec:exec" -->
     <!-- Your version can be determined here: http://www.eclipse.org/jetty/documentation/current/alpn-chapter.html#alpn-versions -->
